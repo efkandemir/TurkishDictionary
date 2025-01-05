@@ -1,20 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
+import HomeScreen from "./screens/HomeScreen"; // HomeStack olarak güncelledik
+import SplashScreen from "./screens/SplashScreen";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HistoryScreen from "./screens/HistoryScreen";
+import FavoriteScreen from "./screens/FavoriteScreen";
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function TabNavigator() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="History" component={HistoryScreen} />
+      {/* HomeStack'i burada çağırıyoruz */}
+      <Tab.Screen name="Search" component={HomeScreen} />
+      <Tab.Screen name="Favorite" component={FavoriteScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
