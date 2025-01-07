@@ -1,17 +1,17 @@
-import { View, Button } from 'react-native';
+import { View, Button, Text } from 'react-native';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailsScreen from './DetailsScreen';
+
 
 const Stack = createNativeStackNavigator();
 
 function HomeScreen({ navigation }) {
     return (
         <View className="flex-1 justify-center items-center bg-white">
-            <Button
-                title="Go to Details... again"
+            <Text className="text-blue-600 font-semibold text-lg"
                 onPress={() => navigation.navigate('Detail')}
-            />
+            >Go to Details</Text>
         </View>
     );
 }

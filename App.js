@@ -6,15 +6,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HistoryScreen from "./screens/HistoryScreen";
 import FavoriteScreen from "./screens/FavoriteScreen";
+import TabBar from "./components/tab-bar"
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function TabNavigator() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Search"
+      tabBar={(props) => <TabBar {...props} />} // Özel TabBar'ı burada tanımlıyoruz
+    >
       <Tab.Screen name="History" component={HistoryScreen} />
-      {/* HomeStack'i burada çağırıyoruz */}
       <Tab.Screen name="Search" component={HomeScreen} />
       <Tab.Screen name="Favorite" component={FavoriteScreen} />
     </Tab.Navigator>
