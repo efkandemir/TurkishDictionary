@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator();
 
 function HomeScreen({ navigation }) {
     return (
-        <View className="flex-1 justify-center items-center bg-white">
+        <View className="flex-1 justify-center items-center">
             <Text className="text-blue-600 font-semibold text-lg"
                 onPress={() => navigation.navigate('Detail')}
             >Go to Details</Text>

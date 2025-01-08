@@ -29,34 +29,46 @@ function TabBar({ state, descriptors, navigation }) {
                     }
                 };
 
-                return (
-                    <TouchableOpacity
-                        key={route.key} // Benzersiz bir `key` sağlamak
-                        onPress={onPress}
-                        className={`flex-1 items-center justify-center py-2 ${isFocused ? 'bg-purple-200' : 'bg-white'
-                            }`}
-                    >
-                        {/* Search için özel ikon */}
-                        {label === 'Search' && (
-                            <AntDesign name="search1" size={24} color={isFocused ? 'purple' : 'black'} />
-                        )}
-                        {/* History için özel ikon */}
-                        {label === 'History' && (
-                            <FontAwesome name="history" size={24} color={isFocused ? 'purple' : 'black'} />
-                        )}
-                        {/* Favorite için özel ikon */}
-                        {label === 'Favorite' && (
-                            <Fontisto name="favorite" size={24} color={isFocused ? 'purple' : 'black'} />
-                        )}
-                        {/* <Text
-                            className={`text-sm mt-1 ${isFocused ? 'text-purple-700 font-bold' : 'text-gray-500'
-                                }`}
+                // Koşullu render burada düzeltiliyor
+                if (label === 'Search') {
+                    return (
+                        <TouchableOpacity
+                            key={route.key}
+                            onPress={onPress}
+                            className="bg-red-500 rounded-full w-14 h-14 flex items-center justify-center mt-[-2px]"
                         >
-                            {label}
-                        </Text> */}
+                            {/* Search İkonu */}
+                            <AntDesign name="search1" size={24} color="white" />
+                        </TouchableOpacity>
+                    );
+                } else {
+                    return (
+                        <TouchableOpacity
+                            key={route.key}
+                            onPress={onPress}
+                            className="flex-1 flex flex-col items-center justify-center pt-1.5 h-14"
+                        >
+                            {/* Diğer İkonlar */}
+                            {label === 'History' && (
+                                <>
+                                    <FontAwesome name="history" size={24} color={isFocused ? '#4682B4' : 'gray'} />
+                                    <View className="mt-1 h-1 w-1">
+                                        {isFocused && <View className="bg-red-500 rounded-full w-1 h-1" />}
+                                    </View>
+                                </>
+                            )}
+                            {label === 'Favorite' && (
+                                <>
+                                    <Fontisto name="favorite" size={24} color={isFocused ? '#4682B4' : 'gray'} />
+                                    <View className="mt-1 h-1 w-1">
+                                        {isFocused && <View className="bg-red-500 rounded-full w-1 h-1" />}
+                                    </View>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    );
+                }
 
-                    </TouchableOpacity>
-                );
             })}
         </View>
     );
