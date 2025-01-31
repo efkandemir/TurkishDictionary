@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, StatusBar } from 'react-native'
 import React from 'react'
 
 export default function DetailsScreen() {
@@ -6,5 +6,6 @@ export default function DetailsScreen() {
     <View>
       <Text>DetailsScreen</Text>
     </View>
+
   )
 }

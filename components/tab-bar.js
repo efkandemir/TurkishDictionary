@@ -1,32 +1,37 @@
-import { View, TouchableOpacity, Keyboard } from 'react-native';
+import { View, TouchableOpacity, Keyboard, Platform } from 'react-native';
 import { Text } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView } from 'react-native';
 
 function TabBar({ state, descriptors, navigation }) {
-    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-            setKeyboardVisible(true);
-        });
-
-        const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-            setKeyboardVisible(false);
-        });
-
-        return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
-        };
-    }, []);
-
-    if (isKeyboardVisible) return null; // Klavye açıldığında TabBar gizlenir
 
     return (
-        <View className="flex-row bg-white py-1 h-16 bottom-0">
+        <View className="flex-row bg-white py-1 h-16 bottom-0"
+            style={{
+                backgroundColor: "white",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                paddingBottom: Platform.OS === "ios" ? 20 : 10,
+                ...Platform.select({
+                    ios: {
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: -3 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 6,
+                    },
+                    android: {
+                        elevation: 10, // Gölgelenmeyi artırdım
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 10 }, // Android için ekstra gölge efekti
+                        shadowOpacity: 0.3,
+                        shadowRadius: 10,
+                    },
+                }),
+            }}
+        >
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const label =

@@ -14,7 +14,7 @@ const Stack = createNativeStackNavigator();
 function TabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={{ headerShown: false,keyboardHidesTabBar: true }}
+      screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
       initialRouteName="Search"
       tabBar={(props) => <TabBar {...props} />} // Özel TabBar'ı burada tanımlıyoruz
     >

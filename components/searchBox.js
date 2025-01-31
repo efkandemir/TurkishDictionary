@@ -1,10 +1,10 @@
-import { View, TextInput, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, Keyboard } from 'react-native';
 import React, { useState, useRef } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
 
 
-const SearchBox = ({ place }) => {
+const SearchBox = ({ place, onChangeFocus }) => {
     const [isFocus, setFocus] = useState(false);
     const [value, setvalue] = useState("")
     const textInputRef = useRef(null); // TextInput için referans ekleyelim
@@ -18,6 +18,22 @@ const SearchBox = ({ place }) => {
     const handleClose = () => {
         setvalue('')
     }
+    React.useEffect(() => {
+        const showSubscription = Keyboard.addListener('keyboardDidShow', _keyboardDidShow)
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', _keyboardDidHide)
+        return function () {
+            showSubscription.remove();
+            hideSubscription.remove();
+        }
+    })
+    const _keyboardDidShow = () => {
+        console.log('Göründü')
+    }
+    const _keyboardDidHide = () => {
+        console.log('Gizlendi')
+    }
+
+
 
     return (
         <View className="w-full px-4 mt-2 flex-row items-center">
