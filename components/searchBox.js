@@ -1,5 +1,5 @@
-import { View, TextInput, Text, TouchableOpacity, Keyboard } from 'react-native';
-import React, { useState, useRef } from 'react';
+import { View, TextInput, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
 
@@ -9,29 +9,22 @@ const SearchBox = ({ place, onChangeFocus }) => {
     const [value, setvalue] = useState("")
     const textInputRef = useRef(null); // TextInput için referans ekleyelim
 
+    const handleClose = () => {
+        setValue('');
+    };
+
+
+
     const handleBlur = () => {
         setFocus(false);
         if (textInputRef.current) {
             textInputRef.current.blur();  // Imleci kaybettiriyoruz
         }
     };
-    const handleClose = () => {
-        setvalue('')
-    }
-    React.useEffect(() => {
-        const showSubscription = Keyboard.addListener('keyboardDidShow', _keyboardDidShow)
-        const hideSubscription = Keyboard.addListener('keyboardDidHide', _keyboardDidHide)
-        return function () {
-            showSubscription.remove();
-            hideSubscription.remove();
-        }
-    })
-    const _keyboardDidShow = () => {
-        console.log('Göründü')
-    }
-    const _keyboardDidHide = () => {
-        console.log('Gizlendi')
-    }
+
+    useEffect(() => {
+        onChangeFocus(isFocus)
+    }, [isFocus])
 
 
 
