@@ -1,12 +1,11 @@
 import { View, TextInput, Text, TouchableOpacity } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { Button } from 'react-native-elements';
 
 
 const SearchBox = ({ place, onChangeFocus }) => {
     const [isFocus, setFocus] = useState(false);
-    const [value, setvalue] = useState("")
+    const [value, setValue] = useState("")
     const textInputRef = useRef(null); // TextInput için referans ekleyelim
 
     const handleClose = () => {
@@ -50,7 +49,7 @@ const SearchBox = ({ place, onChangeFocus }) => {
                     ref={textInputRef}
                     onFocus={() => setFocus(true)}
                     onBlur={() => setFocus(false)}
-                    onChangeText={(text) => setvalue(text)}
+                    onChangeText={(text) => setValue(text)}
                     placeholder={place ? place : "Türkçe Sözlük'te Ara"}
                     className={`flex-1 text-base ${isFocus ? "border-gray-600-600" : "border-transparent"}`}
                     value={value}
