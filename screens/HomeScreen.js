@@ -1,4 +1,4 @@
-import { View, Text, Image, StatusBar, Platform, Animated, FlatList } from 'react-native';
+import { View, Text, Image, StatusBar, Platform, Animated, FlatList, Button, Pressable } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailsScreen from './DetailsScreen';
@@ -8,23 +8,43 @@ import { useFocusEffect } from '@react-navigation/native';
 import Bg from '../components/bg'
 import { CardTitle, CardSummary, CardContainer } from '../components/card'
 import { useNavigation } from '@react-navigation/native';
+import { SimpleCardContainer, SimpleCardTitle } from '../components/simplecard';
+import Entypo from '@expo/vector-icons/Entypo';
+import Feather from '@expo/vector-icons/Feather';
+
+
 const Stack = createNativeStackNavigator();
 function HomeScreen({ navigation }) {
     const [isSearchFocus, setSearchFocus] = useState(false);
     const heroHeight = useState(new Animated.Value(285))[0];
+    const bgOpacity = useState(new Animated.Value(1))[0]
 
     useEffect(() => {
         if (isSearchFocus) {
+            //opacity
+            Animated.timing(bgOpacity, {
+                toValue: 0,
+                duration: 230,
+                useNativeDriver: false
+            }).start();
+            //hero-height
             Animated.timing(heroHeight, {
-                toValue: 95, // Odaklanınca yukarı kaydır, çıkınca eski haline getir
-                duration: 230, // 0.5 saniyede animasyon
+                toValue: 95,
+                duration: 230,
                 useNativeDriver: false
             }).start();
         }
         else {
+            //opacity
+            Animated.timing(bgOpacity, {
+                toValue: 1,
+                duration: 230,
+                useNativeDriver: false
+            }).start();
+            //hero-height
             Animated.timing(heroHeight, {
-                toValue: 285, // Odaklanınca yukarı kaydır, çıkınca eski haline getir
-                duration: 230, // 0.5 saniyede animasyon
+                toValue: 285,
+                duration: 230,
                 useNativeDriver: false
             }).start();
         }
@@ -63,7 +83,7 @@ function HomeScreen({ navigation }) {
             {/* Arama kutusu odaklandığında yukarı kayma efekti */}
             <Animated.View style={{ height: heroHeight }}>
                 {
-                    !isSearchFocus && (
+                    <Animated.View opacity={bgOpacity}>
                         <Bg>
                             <View className="flex-1 justify-center items-center">
                                 <Image
@@ -74,11 +94,13 @@ function HomeScreen({ navigation }) {
                             </View>
 
                         </Bg>
-                    )
+                    </Animated.View>
+
+
                 }
 
 
-                <View className={`p-2 w-full absolute left-0 ${isSearchFocus ? "bottom-0" : "bottom-[-38px]"}`}>
+                <View className={`p-2 w-full absolute left-0 ${isSearchFocus ? "bottom-0" : "bottom-[-35px]"}`}>
                     <SearchBox place="" onChangeFocus={(status) => setSearchFocus(status)} />
                 </View>
             </Animated.View>
@@ -86,15 +108,28 @@ function HomeScreen({ navigation }) {
             {/* İçerik */}
             <View className={`flex-1 bg-softRed -z-10 ${isSearchFocus ? "pt-0" : "pt-[26px]"}`}>
                 {isSearchFocus ? (
-                    <View className="flex-1 p-[30px]">
-                        <Text>History</Text>
+                    <View className="flex-1 ">
+                        <FlatList
+                            className="p-4"
+                            data={DATA}
+                            keyExtractor={item => item.id}
+                            renderItem={({ item }) =>
+                                <View className="py-1">
+                                    <SimpleCardContainer>
+                                        <SimpleCardTitle>{item.title}</SimpleCardTitle>
+                                    </SimpleCardContainer>
+                                </View>
+                            }
+                            ListHeaderComponent={<Text className="uppercase text-textLight mb-[10px]">Son Aramalar</Text>}
+                        />
+
                     </View>
                 ) : (
                     <View className="flex-1 px-6 py-10">
 
                         <View>
                             <Text className="text-textLight">Bir deyim</Text>
-                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail')}>
+                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "on para" })}>
                                 <CardTitle>on para</CardTitle>
                                 <CardSummary>çok az  (para).</CardSummary>
                             </CardContainer>
@@ -102,25 +137,11 @@ function HomeScreen({ navigation }) {
 
                         <View className="mt-[40px]">
                             <Text className="text-textLight">Bir deyim-Atasözü</Text>
-                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail')}>
+                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "Siyem Siyem Ağlamak" })}>
                                 <CardTitle>siyem siyem ağlamak</CardTitle>
                                 <CardSummary>hafif hafif,ince ince,durmadan gözyaşı dökmek</CardSummary>
                             </CardContainer>
                         </View>
-
-
-                        {/* <FlatList
-                            data={DATA}
-                            renderItem={({ item }) =>
-                                <View className="py-1">
-                                    <CardContainer >
-                                        <CardTitle>{item.title}</CardTitle>
-                                        <CardSummary>{item.description}</CardSummary>
-                                    </CardContainer>
-                                </View>
-                            }
-                            keyExtractor={item => item.id}
-                        /> */}
                     </View>
                 )}
             </View>
@@ -131,8 +152,41 @@ function HomeScreen({ navigation }) {
 export default function HomeStack() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="MainSearch" component={HomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Detail" component={DetailsScreen} options={{ title: 'Detail', headerShown: false }} />
+            <Stack.Screen name="MainSearch" component={HomeScreen}
+                options={() => {
+                    return {
+                        headerMode: 'none',
+                        header: () => { }
+                    }
+                }} />
+            <Stack.Screen
+                name="Detail"
+                component={DetailsScreen}
+                options={({ route, navigation }) => ({
+                    title: route.params?.title || '',
+                    headerStyle: {
+                        backgroundColor: '#F8F8F8', // Header arka plan rengi
+                        shadowColor: 'transparent'  // iOS için gölgeyi kaldırma
+                    },
+                    headerTintColor: '#333', // Geri butonu ve başlık rengi
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                    headerTitleAlign: 'center',
+                    headerLeft: () => (
+                        <Pressable className="bg-softRed px-5 h-12 justify-center ml-[-5px]" onPress={() => navigation.goBack()}>
+                            <Entypo name="chevron-left" size={24} color="black" />
+                        </Pressable>
+                    ),
+                    headerRight: () => (
+                        <Pressable className="bg-softRed px-5 h-12 justify-center " onPress={() => navigation.goBack()}>
+                            <Feather name="more-horizontal" size={24} color="black" />
+                        </Pressable>
+                    )
+                })}
+            />
+
+
         </Stack.Navigator>
     );
 }
