@@ -1,4 +1,4 @@
-import { View, Text, Image, StatusBar, Platform, Animated, FlatList, Button, Pressable } from 'react-native';
+import { View, Text, Image, StatusBar, Platform, Animated, FlatList, Button, Pressable, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailsScreen from './DetailsScreen';
@@ -13,11 +13,26 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 
 
+
 const Stack = createNativeStackNavigator();
 function HomeScreen({ navigation }) {
     const [isSearchFocus, setSearchFocus] = useState(false);
     const heroHeight = useState(new Animated.Value(285))[0];
     const bgOpacity = useState(new Animated.Value(1))[0]
+    const [homeData, setHomeData] = useState(null)
+
+    const getHomeData = async () => {
+        try {
+            const response = await fetch("https://sozluk.gov.tr/icerik");
+            const data = await response.json()
+            setHomeData(data);
+        } catch (error) {
+            console.error("Hata oluştu:", error);
+        }
+    };
+    useEffect(() => {
+        getHomeData();
+    }, []);
 
     useEffect(() => {
         if (isSearchFocus) {
@@ -126,20 +141,33 @@ function HomeScreen({ navigation }) {
                     </View>
                 ) : (
                     <View className="flex-1 px-6 py-10">
-
                         <View>
-                            <Text className="text-textLight">Bir deyim</Text>
+                            <Text className="text-textLight">Bir Kelime</Text>
                             <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "on para" })}>
-                                <CardTitle>on para</CardTitle>
-                                <CardSummary>çok az  (para).</CardSummary>
+                                {homeData ? (
+                                    <>
+                                        <CardTitle>{homeData?.kelime[0].madde}</CardTitle>
+                                        <CardSummary>{homeData?.kelime[0].anlam}</CardSummary>
+                                    </>
+                                ) :
+                                    (<ActivityIndicator />)
+                                }
                             </CardContainer>
                         </View>
 
                         <View className="mt-[40px]">
                             <Text className="text-textLight">Bir deyim-Atasözü</Text>
                             <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "Siyem Siyem Ağlamak" })}>
-                                <CardTitle>siyem siyem ağlamak</CardTitle>
-                                <CardSummary>hafif hafif,ince ince,durmadan gözyaşı dökmek</CardSummary>
+                                {homeData ? (
+                                    <>
+                                        <CardTitle>{homeData?.atasoz[0].madde}</CardTitle>
+                                        <CardSummary>{homeData?.atasoz[0].anlam}</CardSummary>
+                                    </>
+                                ) :
+                                    (
+                                    <ActivityIndicator />
+                                )}
+
                             </CardContainer>
                         </View>
                     </View>
@@ -155,15 +183,14 @@ export default function HomeStack() {
             <Stack.Screen name="MainSearch" component={HomeScreen}
                 options={() => {
                     return {
-                        headerMode: 'none',
-                        header: () => { }
+                        headerShown: false
                     }
                 }} />
             <Stack.Screen
                 name="Detail"
                 component={DetailsScreen}
                 options={({ route, navigation }) => ({
-                    title: route.params?.title || '',
+                    title: route.params?.title,
                     headerStyle: {
                         backgroundColor: '#F8F8F8', // Header arka plan rengi
                         shadowColor: 'transparent'  // iOS için gölgeyi kaldırma
