@@ -1,24 +1,18 @@
-import { View, Text, Image, StatusBar, Platform, Animated, FlatList, Button, Pressable, ActivityIndicator } from 'react-native';
+import { View, StatusBar, Pressable, Platform } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailsScreen from './DetailsScreen';
-import SearchBox from '../components/searchBox';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import Bg from '../components/bg'
-import { CardTitle, CardSummary, CardContainer } from '../components/card'
-import { useNavigation } from '@react-navigation/native';
-import { SimpleCardContainer, SimpleCardTitle } from '../components/simplecard';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
-
-
+import SuggestionCard from '../components/suggestionCard';
+import SearchHistoryList from '../components/searchHistoryList';
+import HomeSearchAnimated from '../components/homeSearchAnimated';
 
 const Stack = createNativeStackNavigator();
 function HomeScreen({ navigation }) {
     const [isSearchFocus, setSearchFocus] = useState(false);
-    const heroHeight = useState(new Animated.Value(285))[0];
-    const bgOpacity = useState(new Animated.Value(1))[0]
     const [homeData, setHomeData] = useState(null)
 
     const getHomeData = async () => {
@@ -34,45 +28,15 @@ function HomeScreen({ navigation }) {
         getHomeData();
     }, []);
 
-    useEffect(() => {
-        if (isSearchFocus) {
-            //opacity
-            Animated.timing(bgOpacity, {
-                toValue: 0,
-                duration: 230,
-                useNativeDriver: false
-            }).start();
-            //hero-height
-            Animated.timing(heroHeight, {
-                toValue: 95,
-                duration: 230,
-                useNativeDriver: false
-            }).start();
-        }
-        else {
-            //opacity
-            Animated.timing(bgOpacity, {
-                toValue: 1,
-                duration: 230,
-                useNativeDriver: false
-            }).start();
-            //hero-height
-            Animated.timing(heroHeight, {
-                toValue: 285,
-                duration: 230,
-                useNativeDriver: false
-            }).start();
-        }
-
-    }, [isSearchFocus]);
 
     useFocusEffect(
         React.useCallback(() => {
-            StatusBar.setBackgroundColor(isSearchFocus ? 'white' : '#E11E3C');
+            if (Platform.OS === 'android') {
+                StatusBar.setBackgroundColor(isSearchFocus ? 'white' : '#E11E3C');
+            }
             StatusBar.setBarStyle(isSearchFocus ? 'dark-content' : 'light-content');
         }, [isSearchFocus])
     );
-
 
     const DATA = [
         {
@@ -94,82 +58,27 @@ function HomeScreen({ navigation }) {
 
     return (
         <SafeAreaView className={`flex-1 ${isSearchFocus ? "bg-softRed" : "bg-red"}`}>
-
-            {/* Arama kutusu odaklandığında yukarı kayma efekti */}
-            <Animated.View style={{ height: heroHeight }}>
-                {
-                    <Animated.View opacity={bgOpacity}>
-                        <Bg>
-                            <View className="flex-1 justify-center items-center">
-                                <Image
-                                    source={require('../assets/tdks.png')}
-                                    className="w-[85px] h-[40px]"
-                                    style={{ tintColor: 'white' }}
-                                />
-                            </View>
-
-                        </Bg>
-                    </Animated.View>
-
-
-                }
-
-
-                <View className={`p-2 w-full absolute left-0 ${isSearchFocus ? "bottom-0" : "bottom-[-35px]"}`}>
-                    <SearchBox place="" onChangeFocus={(status) => setSearchFocus(status)} />
-                </View>
-            </Animated.View>
+            <HomeSearchAnimated isSearchFocus={isSearchFocus} onSearchFocus={setSearchFocus} />
 
             {/* İçerik */}
             <View className={`flex-1 bg-softRed -z-10 ${isSearchFocus ? "pt-0" : "pt-[26px]"}`}>
                 {isSearchFocus ? (
                     <View className="flex-1 ">
-                        <FlatList
-                            className="p-4"
-                            data={DATA}
-                            keyExtractor={item => item.id}
-                            renderItem={({ item }) =>
-                                <View className="py-1">
-                                    <SimpleCardContainer>
-                                        <SimpleCardTitle>{item.title}</SimpleCardTitle>
-                                    </SimpleCardContainer>
-                                </View>
-                            }
-                            ListHeaderComponent={<Text className="uppercase text-textLight mb-[10px]">Son Aramalar</Text>}
-                        />
-
+                        <SearchHistoryList data={DATA} />
                     </View>
                 ) : (
                     <View className="flex-1 px-6 py-10">
-                        <View>
-                            <Text className="text-textLight">Bir Kelime</Text>
-                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "on para" })}>
-                                {homeData ? (
-                                    <>
-                                        <CardTitle>{homeData?.kelime[0].madde}</CardTitle>
-                                        <CardSummary>{homeData?.kelime[0].anlam}</CardSummary>
-                                    </>
-                                ) :
-                                    (<ActivityIndicator />)
-                                }
-                            </CardContainer>
-                        </View>
-
-                        <View className="mt-[40px]">
-                            <Text className="text-textLight">Bir deyim-Atasözü</Text>
-                            <CardContainer className="mt-[10px]" onPress={() => navigation.navigate('Detail', { title: "Siyem Siyem Ağlamak" })}>
-                                {homeData ? (
-                                    <>
-                                        <CardTitle>{homeData?.atasoz[0].madde}</CardTitle>
-                                        <CardSummary>{homeData?.atasoz[0].anlam}</CardSummary>
-                                    </>
-                                ) :
-                                    (
-                                    <ActivityIndicator />
-                                )}
-
-                            </CardContainer>
-                        </View>
+                        <SuggestionCard
+                            data={homeData?.kelime[0]}
+                            title="Bir Kelime"
+                            onPress={() => navigation.navigate('Detail', { keyword: homeData?.kelime[0].madde })}
+                        />
+                        <SuggestionCard
+                            mt={40}
+                            data={homeData?.atasoz[0]}
+                            title="Bir Deyim-Atasözü"
+                            onPress={() => navigation.navigate('Detail', { keyword: homeData?.atasoz[0].madde })}
+                        />
                     </View>
                 )}
             </View>
@@ -201,19 +110,17 @@ export default function HomeStack() {
                     },
                     headerTitleAlign: 'center',
                     headerLeft: () => (
-                        <Pressable className="bg-softRed px-5 h-12 justify-center ml-[-5px]" onPress={() => navigation.goBack()}>
+                        <Pressable className="bg-#F8F8F8 px-5 h-12 justify-center ml-[-5px]" onPress={() => navigation.goBack()}>
                             <Entypo name="chevron-left" size={24} color="black" />
                         </Pressable>
                     ),
                     headerRight: () => (
-                        <Pressable className="bg-softRed px-5 h-12 justify-center " onPress={() => navigation.goBack()}>
+                        <Pressable className="bg-#F8F8F8 px-5 h-12 justify-center " onPress={() => navigation.goBack()}>
                             <Feather name="more-horizontal" size={24} color="black" />
                         </Pressable>
                     )
                 })}
             />
-
-
         </Stack.Navigator>
     );
 }

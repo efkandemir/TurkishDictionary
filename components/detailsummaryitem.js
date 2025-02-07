@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-export function DetailSummaryItemContainer({ children, border, ...props }) {
+export function DetailSummaryItemContainer({ children, order, type,border, ...props }) {
     return (
         <View {...props} className="bg-white px-[28px] py-[20px] relative">
             {border && (
@@ -9,8 +9,8 @@ export function DetailSummaryItemContainer({ children, border, ...props }) {
             )}
             <View></View>
             <View className="flex-row">
-                <Text className="ml-[-14px] mr-[7px] text-textLight">1</Text>
-                <Text className="text-red">İSİM</Text>
+                {order && (<Text className="ml-[-14px] mr-[7px] text-textLight">1</Text>)}
+                {type && (<Text className="text-red">İSİM</Text>)}
             </View>
             <View>
                 <Text className="mt-[8px]">{children}</Text>
